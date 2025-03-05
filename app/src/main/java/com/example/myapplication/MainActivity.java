@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             createAction();
         } else {
             updateAction();
-            navegarParaListagem(view);
+            finish();
         }
 
     }

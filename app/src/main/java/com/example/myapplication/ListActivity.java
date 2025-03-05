@@ -45,11 +45,8 @@ public class ListActivity extends AppCompatActivity {
         listView = findViewById(R.id.alunoListView);
         registerForContextMenu(listView);
         dao = new AlunoDAO(this);
-        alunos = dao.obterTodos();
-        alunosFiltrados.addAll(alunos);
 
-        ArrayAdapter<Aluno> adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
-        listView.setAdapter(adaptador);
+        getAllAlunos();
     }
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
@@ -88,5 +85,21 @@ public class ListActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("aluno", aluno);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getAllAlunos();
+    }
+
+    private void getAllAlunos() {
+        alunos = dao.obterTodos();
+
+        alunosFiltrados.clear();
+        alunosFiltrados.addAll(alunos);
+
+        ArrayAdapter<Aluno> adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
+        listView.setAdapter(adaptador);
     }
 }
