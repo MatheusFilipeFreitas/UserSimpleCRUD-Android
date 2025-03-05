@@ -1,12 +1,18 @@
 package com.example.myapplication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -37,6 +43,7 @@ public class ListActivity extends AppCompatActivity {
         });
 
         listView = findViewById(R.id.alunoListView);
+        registerForContextMenu(listView);
         dao = new AlunoDAO(this);
         alunos = dao.obterTodos();
         alunosFiltrados.addAll(alunos);
@@ -45,8 +52,41 @@ public class ListActivity extends AppCompatActivity {
         listView.setAdapter(adaptador);
     }
 
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_menu, menu);
+    }
+
     public void navegarParaCriacao(View view) {
         Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    public void excluir(MenuItem menuItem) {
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+        final Aluno aluno = alunosFiltrados.get(menuInfo.position);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Atenção")
+                .setMessage("Realmente deseja excluir o aluno?")
+                .setNegativeButton("Não", null)
+                .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        alunosFiltrados.remove(aluno);
+                        alunos.remove(aluno);
+                        dao.excluir(aluno);
+                        listView.invalidateViews();
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    public void atualizar(MenuItem menuItem) {
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+        final Aluno aluno = alunosFiltrados.get(menuInfo.position);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("aluno", aluno);
         startActivity(intent);
     }
 }

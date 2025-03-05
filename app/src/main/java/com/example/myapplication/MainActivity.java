@@ -18,7 +18,7 @@ import com.example.myapplication.utils.validator.DocumentValidator;
 import com.example.myapplication.utils.validator.DocumentValidatorImpl;
 
 public class MainActivity extends AppCompatActivity {
-
+    private Aluno aluno = null;
     private EditText nome;
     private EditText cpf;
     private EditText telefone;
@@ -36,25 +36,32 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        Intent intent = getIntent();
+        if (intent.hasExtra("aluno")) {
+            aluno = (Aluno) intent.getSerializableExtra("aluno");
+        }
+
         nome = findViewById(R.id.nameEditText);
         cpf = findViewById(R.id.cpfEditText);
         telefone = findViewById(R.id.telefoneEditText);
+
+        if (!this.isCreate()) {
+            nome.setText(aluno.getNome());
+            cpf.setText(aluno.getCpf());
+            telefone.setText(aluno.getTelefone());
+        }
 
         dao = new AlunoDAO(this);
     }
 
     public void onSave(View view) {
-        Aluno a = new Aluno();
-        if (!validateInputs()) {
-            Toast.makeText(this, "Dados inválidos", Toast.LENGTH_LONG).show();
-            return;
+        if (isCreate()) {
+            createAction();
+        } else {
+            updateAction();
+            navegarParaListagem(view);
         }
-        a.setNome(nome.getText().toString());
-        a.setCpf(cpf.getText().toString());
-        a.setTelefone(telefone.getText().toString());
-        int id = dao.inserir(a);
-        Toast.makeText(this, "Aluno inserido com id: " + id, Toast.LENGTH_SHORT).show();
-        resetFields();
+
     }
 
     public boolean validateInputs() {
@@ -86,4 +93,37 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ListActivity.class);
         startActivity(intent);
     }
+
+    private void createAction() {
+        if (!validateInputs()) {
+            Toast.makeText(this, "Dados inválidos", Toast.LENGTH_LONG).show();
+            return;
+        }
+        aluno = new Aluno();
+        aluno.setNome(nome.getText().toString());
+        aluno.setCpf(cpf.getText().toString());
+        aluno.setTelefone(telefone.getText().toString());
+        int id = dao.inserir(aluno);
+        Toast.makeText(this, "Aluno inserido com id: " + id, Toast.LENGTH_SHORT).show();
+        resetFields();
+    }
+
+    private void updateAction() {
+        if (!validateInputs()) {
+            Toast.makeText(this, "Dados inválidos", Toast.LENGTH_LONG).show();
+            return;
+        }
+        aluno.setNome(nome.getText().toString());
+        aluno.setCpf(cpf.getText().toString());
+        aluno.setTelefone(telefone.getText().toString());
+        dao.atualizar(aluno);
+        Toast.makeText(this, "Aluno atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+        resetFields();
+        aluno = null;
+    }
+
+    private boolean isCreate() {
+        return aluno == null;
+    }
+
 }

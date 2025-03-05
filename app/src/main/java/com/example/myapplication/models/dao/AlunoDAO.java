@@ -37,6 +37,17 @@ public class AlunoDAO {
         return (int) banco.insert("aluno", null, values);
     }
 
+    public void excluir(Aluno aluno) {
+        banco.delete("aluno", "id = ?", new String[]{String.valueOf(aluno.getId())});
+    }
+
+    public void atualizar(Aluno aluno) {
+        ContentValues values = new ContentValues();
+        values.put("nome", aluno.getNome());
+        values.put("cpf", aluno.getCpf());
+        values.put("telefone", aluno.getTelefone());
+        banco.update("aluno", values, "id = ?", new String[] {String.valueOf(aluno.getId())});
+    }
     public List<Aluno> obterTodos() {
         List<Aluno> alunos = new ArrayList<Aluno>();
 
