@@ -16,6 +16,7 @@ public class Aluno implements Serializable {
     private String nome;
     private String cpf;
     private String telefone;
+    private byte[] fotosBytes;
 
     @Override
     public String toString() {
