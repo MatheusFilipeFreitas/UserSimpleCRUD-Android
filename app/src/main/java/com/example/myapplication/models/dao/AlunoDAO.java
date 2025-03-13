@@ -1,68 +1,27 @@
 package com.example.myapplication.models.dao;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.myapplication.models.entity.Aluno;
-import com.example.myapplication.utils.Conexao;
+import com.example.myapplication.models.entity.AlunoDeprecated;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+@Dao
+public interface AlunoDAO {
+    @Insert
+    long insertAluno(Aluno aluno);
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class AlunoDAO {
-    private Conexao conexao;
-    private SQLiteDatabase banco;
+    @Query("SELECT * FROM aluno")
+    List<Aluno> obterTodos();
 
-    public AlunoDAO(Context context) {
-        conexao = new Conexao(context);
-        banco = conexao.getWritableDatabase();
-    }
+    @Update
+    void updateAluno(Aluno aluno);
 
-    public int inserir(Aluno aluno) {
-        ContentValues values = new ContentValues();
-        values.put("nome", aluno.getNome());
-        values.put("cpf", aluno.getCpf());
-        values.put("telefone", aluno.getTelefone());
-        values.put("fotoBytes", aluno.getFotosBytes());
-        return (int) banco.insert("aluno", null, values);
-    }
-
-    public void excluir(Aluno aluno) {
-        banco.delete("aluno", "id = ?", new String[]{String.valueOf(aluno.getId())});
-    }
-
-    public void atualizar(Aluno aluno) {
-        ContentValues values = new ContentValues();
-        values.put("nome", aluno.getNome());
-        values.put("cpf", aluno.getCpf());
-        values.put("telefone", aluno.getTelefone());
-        values.put("fotoBytes", aluno.getFotosBytes());
-        banco.update("aluno", values, "id = ?", new String[] {String.valueOf(aluno.getId())});
-    }
-    public List<Aluno> obterTodos() {
-        List<Aluno> alunos = new ArrayList<Aluno>();
-
-        Cursor cursor = banco.query("aluno",  new String[]{"id", "nome", "cpf", "telefone", "fotoBytes"}, null, null, null, null, null);
-        while (cursor.moveToNext()) {
-            Aluno a = new Aluno();
-            a.setId(cursor.getInt(0));
-            a.setNome(cursor.getString(1));
-            a.setCpf(cursor.getString(2));
-            a.setTelefone(cursor.getString(3));
-            a.setFotosBytes(cursor.getBlob(4));
-            alunos.add(a);
-        }
-        return alunos;
-    }
+    @Delete
+    void deleteAluno(Aluno aluno);
 }

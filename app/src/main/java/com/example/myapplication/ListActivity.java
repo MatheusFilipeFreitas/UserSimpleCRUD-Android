@@ -19,7 +19,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.models.dao.AlunoDAO;
+import com.example.myapplication.models.dao.AlunoDAODeprecated;
 import com.example.myapplication.models.entity.Aluno;
+import com.example.myapplication.models.entity.AlunoDeprecated;
+import com.example.myapplication.utils.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +47,8 @@ public class ListActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.alunoListView);
         registerForContextMenu(listView);
-        dao = new AlunoDAO(this);
+
+        dao = AppDatabase.getInstance(this).alunoDAO();
 
         getAllAlunos();
     }
@@ -72,7 +76,7 @@ public class ListActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         alunosFiltrados.remove(aluno);
                         alunos.remove(aluno);
-                        dao.excluir(aluno);
+                        dao.deleteAluno(aluno);
                         listView.invalidateViews();
                     }
                 }).create();
