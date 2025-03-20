@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,9 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.models.dao.AlunoDAO;
-import com.example.myapplication.models.dao.AlunoDAODeprecated;
 import com.example.myapplication.models.entity.Aluno;
-import com.example.myapplication.models.entity.AlunoDeprecated;
 import com.example.myapplication.utils.AppDatabase;
 import com.example.myapplication.utils.validator.DocumentValidator;
 import com.example.myapplication.utils.validator.DocumentValidatorImpl;
@@ -39,7 +39,9 @@ import lombok.NonNull;
 
 public class MainActivity extends AppCompatActivity {
     private Aluno aluno = null;
+    private String resumoEndereco = null;
     private ImageView profileImageView;
+    private TextView resumoEnderecoView;
     private EditText nome;
     private EditText cpf;
     private EditText telefone;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> cameraLauncher;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,10 +67,19 @@ public class MainActivity extends AppCompatActivity {
             aluno = (Aluno) intent.getSerializableExtra("aluno");
         }
 
+        if (intent.hasExtra("resumoEndereco")) {
+            resumoEndereco = intent.getStringExtra("resumoEndereco");
+        }
+
         nome = findViewById(R.id.nameEditText);
         cpf = findViewById(R.id.cpfEditText);
         telefone = findViewById(R.id.telefoneEditText);
         profileImageView = findViewById(R.id.profileImageView);
+        resumoEnderecoView = findViewById(R.id.resumoEnderecoTextView);
+
+        if (resumoEndereco != null) {
+            resumoEnderecoView.setText(resumoEndereco);
+        }
 
         dao = AppDatabase.getInstance(this).alunoDAO();
 
@@ -153,6 +165,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void navegarParaListagem(View view) {
         Intent intent = new Intent(this, ListActivity.class);
+        startActivity(intent);
+    }
+
+    public void navegarParaCep(View view) {
+        Intent intent = new Intent(this, CepActivity.class);
         startActivity(intent);
     }
 

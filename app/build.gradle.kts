@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation("androidx.room:room-runtime:$room_version")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
     annotationProcessor("androidx.room:room-compiler:$room_version")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

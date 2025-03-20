@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
@@ -32,6 +34,7 @@ public class ListActivity extends AppCompatActivity {
     private ListView listView;
     private AlunoDAO dao;
     private List<Aluno> alunos;
+    private EditText buscar;
     private List<Aluno> alunosFiltrados = new ArrayList<Aluno>();
 
     @Override
@@ -45,6 +48,7 @@ public class ListActivity extends AppCompatActivity {
             return insets;
         });
 
+        buscar = findViewById(R.id.buscarEditText);
         listView = findViewById(R.id.alunoListView);
         registerForContextMenu(listView);
 
@@ -97,13 +101,38 @@ public class ListActivity extends AppCompatActivity {
         getAllAlunos();
     }
 
+    public void filtrar(View view) {
+        List<Aluno> alunosFiltradosPorCampo = new ArrayList<>();
+        String valorCampoBuscar = buscar.getText().toString();
+        if (!valorCampoBuscar.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                alunosFiltradosPorCampo = this.alunos.stream().filter(aluno -> aluno.getNome().contains(valorCampoBuscar)).toList();
+            }
+        } else {
+            alunosFiltradosPorCampo = this.alunos;
+        }
+        this.handleWithAlunosList(alunosFiltradosPorCampo);
+        this.setListInListView(alunosFiltradosPorCampo);
+    }
+
+    public void cancelFiltrar(View view) {
+        this.handleWithAlunosList(alunos);
+        this.setListInListView(alunos);
+    }
+
     private void getAllAlunos() {
         alunos = dao.obterTodos();
+        this.handleWithAlunosList(alunos);
+        this.setListInListView(alunos);
+    }
 
+    private void handleWithAlunosList(List<Aluno> listAlunos) {
         alunosFiltrados.clear();
-        alunosFiltrados.addAll(alunos);
+        alunosFiltrados.addAll(listAlunos);
+    }
 
-        ArrayAdapter<Aluno> adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
+    private void setListInListView(List<Aluno> listAlunos) {
+        ArrayAdapter<Aluno> adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, listAlunos);
         listView.setAdapter(adaptador);
     }
 }
